@@ -7,7 +7,7 @@ services:
     plan: free
     healthCheckPath: /health
     # Render's free tier has no pre-deploy command, so migrate before serving.
-    dockerCommand: sh -c "alembic -c /app/api/alembic.ini upgrade head && python -m forge_api.serve"
+    dockerCommand: python -m forge_api.migrate_and_serve
     envVars:
       - key: ENVIRONMENT
         value: production
