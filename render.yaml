@@ -1,0 +1,31 @@
+# Render Blueprint for the root Dockerfile (see docs/DEPLOYMENT.md).
+# Secrets are never stored here: sync:false makes Render prompt for each value.
+services:
+  - type: web
+    name: forge
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    # Render's free tier has no pre-deploy command, so migrate before serving.
+    dockerCommand: sh -c "alembic -c /app/api/alembic.ini upgrade head && python -m forge_api.serve"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SESSION_SAMESITE
+        value: none
+      - key: FORGE_AI_PROVIDER
+        value: groq
+      - key: APP_BASE_URL
+        sync: false
+      - key: ONSHAPE_REDIRECT_URI
+        sync: false
+      - key: ONSHAPE_CLIENT_ID
+        sync: false
+      - key: ONSHAPE_CLIENT_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
