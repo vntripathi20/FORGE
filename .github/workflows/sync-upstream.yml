@@ -1,0 +1,35 @@
+# Keeps this fork current with the team repo. Render redeploys when main changes.
+name: Sync from upstream
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Merge upstream main
+        run: |
+          git config user.name "forge-sync"
+          git config user.email "forge-sync@users.noreply.github.com"
+          git remote add upstream https://github.com/jishnuhfive/FORGE.git
+          git fetch upstream main
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "Already up to date."
+            exit 0
+          fi
+          git merge upstream/main --no-edit -m "Merge upstream main"
+          git push origin main
